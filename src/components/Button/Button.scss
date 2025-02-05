@@ -1,0 +1,13 @@
+.button {
+  background-color: var(--button-white);
+  border-radius: 25px;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: var(--button-white-hover);
+  border: var(--button-green-border);
+}
