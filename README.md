@@ -9,8 +9,7 @@
 - Получение входящих сообщений
 
 ##  Технологии
-- React, TypeScript
-- Axios (запросы к API)
+- React, TypeScript, MobX, SCSS
 
 ## Установка и запуск
 ```sh
