@@ -63,4 +63,19 @@ input {
   width: 100%;
 }
 
+.input_token {
+  position: relative;
+  width: 100%;
+}
+
+.input_token > img {
+  position: absolute;
+  border-radius: 25px;
+  right: 0;
+  display: inline-block;
+  height: 35px;
+  padding: 5px;
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=Auth.css.map */

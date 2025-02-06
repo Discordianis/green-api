@@ -1,0 +1,31 @@
+.not_found_root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex: 1;
+  justify-content: center;
+}
+
+.not_found_span {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: nowrap;
+  font-size: 100px;
+}
+
+.not_found_span_2 {
+  font-size: 40px;
+  font-weight: unset;
+}
+
+.not_found_button > a > .button {
+  background-color: var(--button-green);
+}
+
+.not_found_button {
+  font-size: 20px;
+  margin-top: 50px;
+}

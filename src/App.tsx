@@ -4,6 +4,8 @@ import Chat from "./features/Chat/Chat.tsx";
 import './App.css'
 import GreenAPI from "./store/greenAPI.tsx";
 import {observer} from "mobx-react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import NotFound from "./features/NotFound/NotFound.tsx";
 
 const App: React.FC = observer(() => {
 
@@ -16,7 +18,21 @@ const App: React.FC = observer(() => {
 
     return (
         <div className="app">
-            {authStatus ? <Chat/> : <Auth/>}
+            <BrowserRouter>
+                <Routes>
+                    {authStatus ?
+                        <>
+                            <Route path={''} element={<Chat />} />
+                            <Route path={'*'} element={<NotFound />} />
+                        </>
+                        :
+                        <>
+                            <Route path={''} element={<Auth />} />
+                            <Route path={'*'} element={<NotFound />} />
+                        </>
+                    }
+                </Routes>
+            </BrowserRouter>
         </div>
     );
 });

@@ -13,12 +13,14 @@
   -moz-osx-font-smoothing: grayscale;
 
   --wheat-bg: #fcf5eb;
+  --wheat-bg-hover: #fff6e4;
   --green-decor: #25d366;
   --button-white: #f0f2f5;
   --button-white-hover: #e9edef;
   --button-green: #017561;
   --button-green-hover: #048770;
   --button-green-border: 1px #15ba9d solid;
+  --chat-color: #d9fdd3;
   --black-bg: #111b21;
   --input-bg: #f3f3f3;
 }
@@ -33,20 +35,26 @@ a {
   font-weight: 500;
   color: var(--button-green);
   text-decoration: none;
-  border: transparent 1px solid;
-  transition: border-bottom-color 0.3s ease-in-out;
 }
 a:hover {
   color: var(--button-green-hover);
+}
+
+span > a {
+  border: transparent 1px solid;
+  transition: border-bottom-color 0.3s ease-in-out;
+}
+
+span > a:hover {
   border-bottom: var(--green-decor) 1px solid;
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 h1 {
