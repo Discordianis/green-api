@@ -18,7 +18,7 @@ const App: React.FC = observer(() => {
 
     return (
         <div className="app">
-            <BrowserRouter>
+            <BrowserRouter basename={import.meta.env.BASE_URL}>
                 <Routes>
                     {authStatus ?
                         <>
