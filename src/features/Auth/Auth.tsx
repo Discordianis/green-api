@@ -78,48 +78,50 @@ const Auth: React.FC = observer(() => {
     }
 
     return (
-        <div className={'auth_root'}>
-            <Suspense fallback={<Loading />}>
-                <h2>Вход в систему</h2>
-                <div className={'auth_root_sub'}>
-                    <div className={'auth_help'}>
-                        <h3>Как войти в систему?</h3>
-                        <span>• Войдите или зарегистрируйтесь на платформе <a href={'https://green-api.com/'}>Green API</a>.</span>
-                        <span>• В консоли профиля после входа в аккаунт создайте инстанс и войдите в него.</span>
-                        <span>• Ниже вы увидите QR-код, с его помощью привяжите ваш WhatsApp аккаунт с созданным инстансом.</span>
-                        <span>• Когда инстанс станет активным, скопируйте «<span style={{fontFamily: 'monospace'}}>idInstance</span>» и «<span style={{fontFamily: 'monospace'}}>apiTokenInstance</span>».</span>
-                        <span>• Вставьте скопированные данные в соответствующие поля здесь.</span>
-                    </div>
-                    <div className={'form_auth'}>
-                        <form>
-                            <input
-                                type="text"
-                                placeholder="idInstance"
-                                value={idInstance.value}
-                                autoComplete={'name'}
-                                onChange={(e) => idInstance.onChange(e)}
-                                maxLength={10}
-                                required
-                            />
-                            <div className={'input_token'}>
+        <div className={'auth_rooter'}>
+            <div className={'auth_root'}>
+                <Suspense fallback={<Loading />}>
+                    <h2>Вход в систему</h2>
+                    <div className={'auth_root_sub'}>
+                        <div className={'auth_help'}>
+                            <h3>Как войти в систему?</h3>
+                            <span>• Войдите или зарегистрируйтесь на платформе <a href={'https://green-api.com/'}>Green API</a>.</span>
+                            <span>• В консоли профиля после входа в аккаунт создайте инстанс и войдите в него.</span>
+                            <span>• Ниже вы увидите QR-код, с его помощью привяжите ваш WhatsApp аккаунт с созданным инстансом.</span>
+                            <span>• Когда инстанс станет активным, скопируйте «<span style={{fontFamily: 'monospace'}}>idInstance</span>» и «<span style={{fontFamily: 'monospace'}}>apiTokenInstance</span>».</span>
+                            <span>• Вставьте скопированные данные в соответствующие поля здесь.</span>
+                        </div>
+                        <div className={'form_auth'}>
+                            <form>
                                 <input
-                                    type={showPass ? "text" : "password"}
-                                    placeholder="apiTokenInstance"
-                                    value={apiTokenInstance.value}
-                                    onChange={(e) => apiTokenInstance.onChange(e)}
-                                    maxLength={50}
+                                    type="text"
+                                    placeholder="idInstance"
+                                    value={idInstance.value}
+                                    autoComplete={'name'}
+                                    onChange={(e) => idInstance.onChange(e)}
+                                    maxLength={10}
                                     required
                                 />
-                                <img src={showPass ? unvisible : visible} onClick={showToken} alt="" />
-                            </div>
-                            <div className={'auth_button'}>
-                                <Button onClick={handleSubmit}>Войти</Button>
-                            </div>
-                        </form>
+                                <div className={'input_token'}>
+                                    <input
+                                        type={showPass ? "text" : "password"}
+                                        placeholder="apiTokenInstance"
+                                        value={apiTokenInstance.value}
+                                        onChange={(e) => apiTokenInstance.onChange(e)}
+                                        maxLength={50}
+                                        required
+                                    />
+                                    <img src={showPass ? unvisible : visible} onClick={showToken} alt="" />
+                                </div>
+                                <div className={'auth_button'}>
+                                    <Button onClick={handleSubmit}>Войти</Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <NotificationComponent />
-            </Suspense>
+                    <NotificationComponent />
+                </Suspense>
+            </div>
         </div>
     );
 });
