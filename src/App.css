@@ -42,6 +42,9 @@
   #root {
     padding: 0;
   }
+  .chat_root {
+    max-height: 100%;
+  }
 }
 
 .card {

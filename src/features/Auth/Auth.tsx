@@ -107,6 +107,7 @@ const Auth: React.FC = observer(() => {
                                         type={showPass ? "text" : "password"}
                                         placeholder="apiTokenInstance"
                                         value={apiTokenInstance.value}
+                                        autoComplete={'current-password'}
                                         onChange={(e) => apiTokenInstance.onChange(e)}
                                         maxLength={50}
                                         required

@@ -10,6 +10,8 @@ import settingsImg from '../../../public/settings.svg';
 import searchImg from '../../../public/search.svg';
 import bgChat from '../../../public/bg-chat.svg';
 import sendImg from '../../../public/send.svg';
+import doneImg from '../../../public/done.svg';
+import doneAllImg from '../../../public/done_all.svg';
 import {SetSettings} from "../../api/SetSettings.tsx";
 
 interface IChatListInfo {
@@ -17,7 +19,7 @@ interface IChatListInfo {
     id?: string;
     name?: string;
     last_message?: string | null;
-    phone: string;
+    phone?: string;
 }
 
 interface IChatList {
@@ -37,19 +39,20 @@ interface IProfileInfo {
 }
 
 export interface IMessages {
-    type: string | 'incoming' | 'outgoing'
-    idMessage: string
+    type?: string | 'incoming' | 'outgoing'
+    idMessage?: string
     timestamp: number
-    typeMessage: string
-    chatId: string
-    textMessage: string
-    extendedTextMessage: ExtendedTextMessage
-    statusMessage: string
-    sendByApi: boolean
-    deletedMessageId: string
-    editedMessageId: string
-    isEdited: boolean
-    isDeleted: boolean
+    typeMessage?: string
+    chatId?: string
+    textMessage?: string
+    extendedTextMessage?: ExtendedTextMessage
+    statusMessage?: string
+    sendByApi?: boolean
+    deletedMessageId?: string
+    editedMessageId?: string
+    isEdited?: boolean
+    isDeleted?: boolean
+    receiptId?: string
 }
 
 export interface ExtendedTextMessage {
@@ -144,10 +147,6 @@ const Chat: React.FC = () => {
         }
     }, [messages]);
 
-    useEffect(() => {
-        console.log(messages)
-    }, [messages]);
-
     const createChatResponse = async () => {
         if (!phoneNumber.value) {
             return
@@ -190,60 +189,54 @@ const Chat: React.FC = () => {
     };
 
     const sendMessage = async () => {
-        if (!currentChat || !messageInput.value) return;
+        if (!currentChat || !messageInput.value.trim()) {
+            return;
+        }
 
-        const chatId = `${currentChat?.id}@c.us`;
+        const tempId = `temp_${Date.now()}`;
+        const newMessage = {
+            type: 'outgoing' as const,
+            chatId: currentChat.id,
+            textMessage: messageInput.value.trim(),
+            timestamp: Date.now(),
+            idMessage: tempId,
+            statusMessage: 'pending',
+        };
 
-        if (!messageInput.value.trim()) return;
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
 
         try {
             const response = await fetch(`https://api.green-api.com/waInstance${authData?.idInstance}/sendMessage/${authData?.apiTokenInstance}`, {
                 method: 'POST',
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     chatId: currentChat?.id,
                     message: messageInput.value.trim(),
                 }),
             });
 
-            if (response.ok) {
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    {
-                        type: 'outgoing',
-                        idMessage: Date.now().toString(),
-                        timestamp: Date.now(),
-                        typeMessage: 'text',
-                        chatId,
-                        textMessage: messageInput.value.trim(),
-                        extendedTextMessage: {
-                            text: messageInput.value.trim(),
-                            description: '',
-                            title: '',
-                            previewType: '',
-                            jpegThumbnail: '',
-                            forwardingScore: 0,
-                            isForwarded: false,
-                        },
-                        statusMessage: 'sent',
-                        sendByApi: true,
-                        deletedMessageId: '',
-                        editedMessageId: '',
-                        isEdited: false,
-                        isDeleted: false,
-                    },
-                ]);
-
-                messageInput.setValue('');
-            } else {
-                console.error('Ошибка отправки сообщения:', response?.statusText);
-                showNotification('Ошибка отправки сообщения', 'error');
+            const data = await response.json();
+            if (data.idMessage) {
+                setMessages(prev => prev.map(msg =>
+                    msg.idMessage === tempId ? { ...msg, idMessage: data.idMessage, statusMessage: 'sent' } : msg
+                ));
             }
         } catch (error) {
+            setMessages(prev => prev.map(msg =>
+                msg.idMessage === tempId ? { ...msg, statusMessage: 'error' } : msg
+            ));
             console.error("Ошибка отправки:", error);
             showNotification('Произошла ошибка. Подробности в консоли.', "error");
         }
+
+        messageInput.setValue('');
     };
+
+
+    useEffect(() => {
+        console.log(messages)
+    }, [messages]);
+
 
     const fetchMessages = async () => {
         try {
@@ -252,55 +245,50 @@ const Chat: React.FC = () => {
             );
             const data = await res.json();
 
-            if (!data || !data.body) {
-                console.log("Очередь уведомлений пуста.");
-                return null;
+            if (!data || !data.body) return;
+
+            const message = data.body;
+
+            if (message.typeWebhook === "incomingMessageReceived") {
+                const newIncomingMessage: IMessages = {
+                    type: 'incoming',
+                    idMessage: message.idMessage,
+                    chatId: message.senderData.chatId,
+                    textMessage: message.messageData?.textMessageData?.textMessage,
+                    timestamp: message.timestamp,
+                };
+
+                // Проверка на дубликат
+                setMessages(prev => {
+                    const isDuplicate = prev.some(msg => msg.idMessage === newIncomingMessage.idMessage);
+                    if (!isDuplicate) {
+                        return [...prev, newIncomingMessage];
+                    }
+                    return prev;
+                });
+            } else if (message.typeWebhook === "outgoingMessageStatus") {
+                const { idMessage, status } = message;
+                setMessages(prev => prev.map(msg =>
+                    msg.idMessage === idMessage ? { ...msg, statusMessage: status } : msg
+                ));
             }
 
-            const newMessage = {
-                type: "incoming",
-                receiptId: data?.receiptId,
-                idMessage: data.body?.idMessage || Date.now().toString(),
-                timestamp: data.body?.timestamp || Date.now(),
-                typeMessage: data.body?.typeMessage || "text",
-                chatId: data.body?.senderData?.chatId,
-                textMessage: data.body.messageData?.textMessageData?.textMessage || "",
-                extendedTextMessage: {
-                    text: data.body?.messageData?.textMessageData?.textMessage || "",
-                    description: "",
-                    title: "",
-                    previewType: "",
-                    jpegThumbnail: "",
-                    forwardingScore: 0,
-                    isForwarded: false,
-                },
-                statusMessage: "received",
-                sendByApi: false,
-                deletedMessageId: "",
-                editedMessageId: "",
-                isEdited: false,
-                isDeleted: false,
-            };
-
-            setMessages((prev: IMessages[]) => {
-                const isDuplicate = prev.some(msg => msg?.idMessage === newMessage?.idMessage);
-                return isDuplicate ? prev : [...prev, newMessage];
-            });
-
-            await deleteNotification(newMessage?.receiptId)
-
-            console.log("Сообщение добавлено:", newMessage);
+            await deleteNotification(data.receiptId);
         } catch (error) {
             console.error("Ошибка при запросе:", error);
         }
     };
 
-
     useEffect(() => {
-        console.log(messages)
-    }, [messages]);
+        if (textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [currentChat]);
 
     const deleteNotification = async (receiptId: number) => {
+        if (!receiptId) {
+            return
+        }
         try {
             await fetch(
                 `https://api.green-api.com/waInstance${authData?.idInstance}/deleteNotification/${authData?.apiTokenInstance}/${receiptId}`,
@@ -316,7 +304,7 @@ const Chat: React.FC = () => {
         if (currentChat) {
             const interval = setInterval(async () => {
                 await fetchMessages();
-            }, 5000);
+            }, 1000);
             return () => clearInterval(interval);
         }
     }, [currentChat]);
@@ -341,7 +329,7 @@ const Chat: React.FC = () => {
                     });
                     const data = await res.json()
                     if (data) {
-                        setMessages(data)
+                        setMessages(data.reverse())
                     }
                 } catch (e) {
                     console.log('Error: ', e)
@@ -404,11 +392,17 @@ const Chat: React.FC = () => {
                             <Button onClick={createChatResponse} disabled={pending}>Создать</Button>
                         </div>
                     }
+                    {!chatList &&
+                        <div className="nothing_chats">
+                            <span>Нет ни одного чата...</span>
+                            <Button onClick={() => setCreateNewChat(true)}>Создать чат</Button>
+                        </div>
+                    }
                     <div className="right_bar_chatlist">
-                        {chatList ? (
-                            Object.values(chatList).map((chat: IChatListInfo) => (
-                                <div key={chat.id} onClick={() => handleClick(chat.id as string)}
-                                style={{pointerEvents: isDisabled ? 'none' : 'auto', opacity: isDisabled ? '0.5' : '1', transition: 'opacity 0.3s ease-in-out'}}>
+                        {chatList && (
+                            Object.values(chatList).map((chat: IChatListInfo, index) => (
+                                <div key={index} onClick={() => handleClick(chat.id as string)}
+                                style={{pointerEvents: isDisabled ? 'none' : 'auto', opacity: isDisabled ? '0.5' : '1'}}>
                                     <img src={chat.avatar} alt="user_avatar"/>
                                     <div>
                                         <h4>{chat.name ? chat.name : chat.phone}</h4>
@@ -416,11 +410,6 @@ const Chat: React.FC = () => {
                                     </div>
                                 </div>
                             ))
-                        ) : (
-                            <div className="nothing_chats">
-                                <span>Нет ни одного чата...</span>
-                                <Button onClick={() => setCreateNewChat(true)}>Создать чат</Button>
-                            </div>
                         )}
                     </div>
                 </div>
@@ -442,9 +431,9 @@ const Chat: React.FC = () => {
                     <div className={'chat_left_content'} id={'chat_left_content'} ref={chatRef}>
                         {currentChat && messages ?
                             <div>
-                                {messages.sort((a: IMessages, b: IMessages) => a.timestamp - b.timestamp).map((message: IMessages) =>
+                                {Object.values(messages).map((message: IMessages, index) =>
                                     message.type === 'outgoing' ?
-                                        <div className={'outgoing_message'} key={message?.idMessage}>
+                                        <div className={'outgoing_message'} key={index}>
                                             <div>
                                                 <span aria-hidden="true" className="rmk7">
                                                     <svg
@@ -459,7 +448,16 @@ const Chat: React.FC = () => {
                                                               d="M5.188,0H0v11.193l6.467-8.625C7.526,1.156,6.958,0,5.188,0z"/>
                                                     </svg>
                                                 </span>
-                                                <span>{message.textMessage}</span>
+                                                <span className={'message_text'}>{message.textMessage}</span>
+                                                <span className={message?.statusMessage === 'read' ? 'msg_done_all' : 'msg_done'}>
+                                                    {message.statusMessage === 'read' ? (
+                                                        <img src={doneAllImg} alt={'done'}/>
+                                                    ) : message.statusMessage === 'sent' ? (
+                                                        <img src={doneImg} alt={'done'}/>
+                                                    ) : (
+                                                        <span className="pending-status">🕒</span>
+                                                    )}
+                                                </span>
                                             </div>
                                         </div>
                                         :

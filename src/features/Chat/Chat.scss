@@ -82,7 +82,7 @@
   border-bottom: #80808040 1px solid;
   padding: 5px 10px;
   margin: 5px 0;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, opacity 0.3s ease-in-out;
   cursor: pointer;
 
   &:hover {
@@ -109,6 +109,13 @@
   }
 }
 
+.nothing_chats .button {
+  background-color: var(--button-green);
+  &:hover {
+    background-color: var(--button-green-hover);
+  }
+}
+
 .chat_left_message_input {
   position: relative;
 
@@ -123,6 +130,10 @@
     color: var(--black-bg);
     overflow: auto;
     font-family: sans-serif;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   & img {
@@ -143,7 +154,6 @@
     opacity: 0;
   }
 }
-
 .chat_right_bar_root {
   max-width: 40%;
   width: 100%;
@@ -240,4 +250,20 @@
     top: 0;
     display: flex;
   }
+}
+
+.msg_done > img, .msg_done_all > img {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+}
+
+.msg_done_all > img {
+  fill: blue;
+}
+
+.message_text {
+  margin-right: 25px;
 }

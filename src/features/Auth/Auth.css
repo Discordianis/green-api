@@ -30,6 +30,7 @@ input {
 
 .auth_root_sub {
   display: flex;
+  gap: 10px;
 }
 
 .auth_root {
@@ -82,6 +83,13 @@ input {
   height: 35px;
   padding: 5px;
   cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .auth_root_sub {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 /*# sourceMappingURL=Auth.css.map */
