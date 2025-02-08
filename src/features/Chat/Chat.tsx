@@ -353,6 +353,14 @@ const Chat: React.FC = () => {
         window.location.reload()
     }
 
+    const filteredChatList = chatList ? Object.values(chatList).filter((chat: IChatListInfo) => {
+        if (!searchInput.value){
+            return true;
+        }
+        const search = searchInput.value.toLowerCase();
+        return chat.name && chat.name.toLowerCase().includes(search) || chat.phone && chat.phone.includes(search);
+    }) : [];
+
     if (loading) {
         return <Loading/>;
     }
@@ -397,8 +405,8 @@ const Chat: React.FC = () => {
                         </div>
                     }
                     <div className="right_bar_chatlist">
-                        {chatList && (
-                            Object.values(chatList).map((chat: IChatListInfo, index) => (
+                        {filteredChatList && (
+                            Object.values(filteredChatList).map((chat: IChatListInfo, index) => (
                                 <div key={index} onClick={() => handleClick(chat.id as string)}
                                 style={{pointerEvents: isDisabled ? 'none' : 'auto', opacity: isDisabled ? '0.5' : '1'}}>
                                     <img src={chat.avatar} alt="user_avatar"/>

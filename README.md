@@ -12,8 +12,9 @@
 - React, TypeScript, MobX, SCSS
 
 ## Установка и запуск
+На момент разработки использовалась Node.js v20.15.1
 ```sh
-git clone https://github.com/your-username/whatsapp-green-api-chat.git
-cd whatsapp-green-api-chat
+git clone https://github.com/Discordianis/green-api.git
+cd green-api
 npm install
-npm start
+npm run dev
