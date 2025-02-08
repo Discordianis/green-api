@@ -6,7 +6,7 @@ import useInput from "../../hooks/useInput.tsx";
 import useSuccess from "../../hooks/useSuccess.tsx";
 import Button from "../../components/Button/Button.tsx";
 import addChatImg from '../../../public/add_chat.svg';
-import settingsImg from '../../../public/settings.svg';
+import exitImg from '../../../public/exit_to_app.svg';
 import searchImg from '../../../public/search.svg';
 import bgChat from '../../../public/bg-chat.svg';
 import sendImg from '../../../public/send.svg';
@@ -195,7 +195,7 @@ const Chat: React.FC = () => {
 
         const tempId = `temp_${Date.now()}`;
         const newMessage = {
-            type: 'outgoing' as const,
+            type: 'outgoing',
             chatId: currentChat.id,
             textMessage: messageInput.value.trim(),
             timestamp: Date.now(),
@@ -232,12 +232,6 @@ const Chat: React.FC = () => {
         messageInput.setValue('');
     };
 
-
-    useEffect(() => {
-        console.log(messages)
-    }, [messages]);
-
-
     const fetchMessages = async () => {
         try {
             const res = await fetch(
@@ -258,7 +252,6 @@ const Chat: React.FC = () => {
                     timestamp: message.timestamp,
                 };
 
-                // Проверка на дубликат
                 setMessages(prev => {
                     const isDuplicate = prev.some(msg => msg.idMessage === newIncomingMessage.idMessage);
                     if (!isDuplicate) {
@@ -355,6 +348,11 @@ const Chat: React.FC = () => {
         }, 2000);
     };
 
+    const handleExit = () => {
+        localStorage.clear()
+        window.location.reload()
+    }
+
     if (loading) {
         return <Loading/>;
     }
@@ -369,8 +367,8 @@ const Chat: React.FC = () => {
                             <Button title="Новый чат" onClick={() => setCreateNewChat(true)}>
                                 <img src={addChatImg} alt="addChat"/>
                             </Button>
-                            <Button title="Настройки">
-                                <img src={settingsImg} alt="settings"/>
+                            <Button title="Выход из аккаутна" onClick={handleExit}>
+                                <img src={exitImg} alt="exit"/>
                             </Button>
                         </div>
                     </div>

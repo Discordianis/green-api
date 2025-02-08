@@ -111,6 +111,9 @@
 
 .chat_left_message_input {
   position: relative;
+  display: flex;
+  background: aliceblue;
+  flex-wrap: nowrap;
 }
 .chat_left_message_input textarea {
   width: 100%;
@@ -128,9 +131,6 @@
   outline: none;
 }
 .chat_left_message_input img {
-  position: absolute;
-  top: 0;
-  right: 0;
   height: 40px;
   width: 40px;
   padding: 5px;
